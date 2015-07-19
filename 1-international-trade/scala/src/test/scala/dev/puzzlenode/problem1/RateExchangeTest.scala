@@ -4,7 +4,8 @@ import org.scalatest.FlatSpec
 
 class RateExchangeTest extends FlatSpec {
   val exchange = new RateExchange(List(
-    Rate("USD", "CAD", BigDecimal(1.002))
+    Rate("USD", "CAD", BigDecimal(1.002)),
+    Rate("SFK", "CAD", BigDecimal(3.50))
   ))
 
   behavior of "RateExchange"
@@ -23,5 +24,9 @@ class RateExchangeTest extends FlatSpec {
 
   it should "Return none if it doesn't know about a rate" in {
     assert(exchange.getRate("Not a real rate", "Another fake rate") === None)
+  }
+
+  it should "Figure out transitive rates" in {
+    assert(exchange.getRate("USD", "SFK") === BigDecimal(1.002) * BigDecimal(1.0) / BigDecimal(3.50))
   }
 }
