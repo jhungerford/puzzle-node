@@ -24,12 +24,16 @@ class SketchTest extends FlatSpec {
 
     val exchange = new RateExchange(rates)
 
-    val total = transactions
+    val zero: Option[BigDecimal] = Some(BigDecimal("0.00"))
+    val total: Option[BigDecimal] = transactions
       .filter(_.sku == "DM1182")
       .map(_.amount.toCurrency("USD", exchange))
-      .foldLeft(BigDecimal("0.00")) { (sum, amount) => sum + amount }
+      .foldLeft(zero) {
+        case (Some(sum), Some(amount)) => Some(sum + amount)
+        case _ => None
+      }
 
-    assert(total === BigDecimal("134.22"))
+    assert(total === Some(BigDecimal("134.22")))
   }
 
 }
