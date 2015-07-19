@@ -2,7 +2,7 @@ package dev.puzzlenode
 
 package object problem1 {
   case class Amount(value: BigDecimal, currency: String) {
-    def toCurrency(currency: String, rates: RateExchange): BigDecimal = ???
+    def toCurrency(toCurrency: String, rates: RateExchange): BigDecimal = rates.getRate(currency, toCurrency) * value
   }
 
   case class Rate(fromCurrency: String, toCurrency: String, rate: BigDecimal)
