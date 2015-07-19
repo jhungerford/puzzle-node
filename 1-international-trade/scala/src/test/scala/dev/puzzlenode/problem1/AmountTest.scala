@@ -10,14 +10,14 @@ class AmountTest extends FlatSpec {
     val exchange = new RateExchange(List(Rate("USD", "CAD", BigDecimal(1.002))))
     val amount = Amount(BigDecimal(2.19), "USD")
 
-    assert(amount.toCurrency("USD", exchange) === amount.value)
+    assert(amount.toCurrency("USD", exchange) === Some(amount.value))
   }
 
   it should "apply the currency conversion correctly" in {
     val exchange = new RateExchange(List(Rate("USD", "CAD", BigDecimal(1.002))))
     val amount = Amount(BigDecimal(2.19), "USD")
 
-    assert(amount.toCurrency("CAD", exchange) === amount.value * BigDecimal(1.002))
+    assert(amount.toCurrency("CAD", exchange) === Some(amount.value * BigDecimal(1.002)))
   }
 
 }
