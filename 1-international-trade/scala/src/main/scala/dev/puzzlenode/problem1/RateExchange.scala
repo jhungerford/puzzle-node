@@ -1,18 +1,29 @@
 package dev.puzzlenode.problem1
 
-class RateExchange(rates: List[Rate]) {
-  def getRate(fromCurrency: String, toCurrency: String): Option[BigDecimal] = {
+class RateExchange private(rateMap: Map[String, List[RateEdge]]) {
+  def getConversion(fromCurrency: String, toCurrency: String): Option[BigDecimal] = {
     if (fromCurrency.equals(toCurrency)) {
       Some(BigDecimal(1.0))
     } else {
-      rates.find( rate => rate.fromCurrency.equals(fromCurrency) && rate.toCurrency.equals(toCurrency) ) match {
-        case Some(rate) => Some(rate.rate)
-        case None =>
-          rates.find( rate => rate.toCurrency.equals(fromCurrency) && rate.fromCurrency.equals(toCurrency) ) match {
-            case Some(rate) => Some(BigDecimal(1.0) / rate.rate)
-            case None => None
-          }
-      }
+      for {
+        path <- findPath(fromCurrency, toCurrency, List.empty)
+        conversions <- Some( conversions(path) )
+      } yield product(conversions)
     }
   }
+
+  private def findPath(fromCurrency: String, toCurrency: String, stack: List[String]): Option[List[RateEdge]] = ???
+
+  private def conversions(path: List[RateEdge]): List[BigDecimal] = path.map( _.conversion )
+  private def product(conversions: List[BigDecimal]): BigDecimal = conversions.foldLeft(BigDecimal(1.0))(_ * _)
 }
+
+object RateExchange {
+  def apply(rates: List[Rate]): RateExchange = {
+    val rateMap: Map[String, List[RateEdge]] = ???
+
+    new RateExchange(rateMap)
+  }
+}
+
+private case class RateEdge(toCurrency: String, conversion: BigDecimal)
