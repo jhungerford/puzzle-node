@@ -34,6 +34,6 @@ class SketchTest extends FlatSpec with Matchers {
       }
 
     total shouldBe defined
-    total.get.doubleValue() should be (134.22 +- 0.01)
+    total.get.doubleValue() should be (134.22 +- 0.001)
   }
 }
