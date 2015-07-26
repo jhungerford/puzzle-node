@@ -1,8 +1,8 @@
 package dev.puzzlenode.problem1
 
-import org.scalatest.FlatSpec
+import org.scalatest.{Matchers, FlatSpec}
 
-class SketchTest extends FlatSpec {
+class SketchTest extends FlatSpec with Matchers {
 
   behavior of "Problem 1 solution"
 
@@ -22,7 +22,7 @@ class SketchTest extends FlatSpec {
       Rate("USD", "CAD", BigDecimal(0.9911))
     )
 
-    val exchange = new RateExchange(rates)
+    val exchange = RateExchange(rates)
 
     val zero: Option[BigDecimal] = Some(BigDecimal("0.00"))
     val total: Option[BigDecimal] = transactions
@@ -33,7 +33,7 @@ class SketchTest extends FlatSpec {
         case _ => None
       }
 
-    assert(total === Some(BigDecimal("134.22")))
+    total shouldBe defined
+    total.get.doubleValue() should be (134.22 +- 0.01)
   }
-
 }

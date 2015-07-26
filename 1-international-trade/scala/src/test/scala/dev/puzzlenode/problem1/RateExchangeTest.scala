@@ -1,8 +1,8 @@
 package dev.puzzlenode.problem1
 
-import org.scalatest.FlatSpec
+import org.scalatest.{Matchers, FlatSpec}
 
-class RateExchangeTest extends FlatSpec {
+class RateExchangeTest extends FlatSpec with Matchers {
 
   /*
    *     1.0079       1.0090
@@ -22,7 +22,7 @@ class RateExchangeTest extends FlatSpec {
    */
   val exchange = RateExchange(List(
     Rate("AUD", "CAD", BigDecimal(1.0079)),
-    Rate("CAD", "UAD", BigDecimal(1.0090)),
+    Rate("CAD", "USD", BigDecimal(1.0090)),
     Rate("USD", "CAD", BigDecimal(0.9911)),
     Rate("CAD", "RUB", BigDecimal(0.9100)),
     Rate("LYR", "YEN", BigDecimal(0.0700))
@@ -30,27 +30,50 @@ class RateExchangeTest extends FlatSpec {
 
   behavior of "RateExchange"
 
-  it should "Return 1 for the same rate" in {
+  it should "return 1 for the same rate" in {
     assert(exchange.getConversion("USD", "USD") === Some(BigDecimal(1.0)))
   }
 
-  it should "Return a rate it knows about" in {
+  it should "return a rate it knows about" in {
     assert(exchange.getConversion("USD", "CAD") === Some(BigDecimal(0.9911)))
   }
 
-  it should "Invert a rate if it knows the inverse rate" in {
+  it should "invert a rate if it knows the inverse rate" in {
     assert(exchange.getConversion("CAD", "AUD") === Some(BigDecimal(1.0) / BigDecimal(1.0079)))
   }
 
-  it should "Return none if it doesn't know about a rate" in {
+  it should "return none if it doesn't know about a rate" in {
     assert(exchange.getConversion("Not a real rate", "Another fake rate") === None)
   }
 
-  it should "Return none if two rates aren't connected" in {
+  it should "return none if two rates aren't connected" in {
     assert(exchange.getConversion("LYR", "RUB") === None)
   }
 
-  it should "Figure out transitive rates" in {
-    assert(exchange.getConversion("USD", "AUD") === BigDecimal(0.9911) * (BigDecimal(1.0) / BigDecimal(1.0079)))
+  it should "figure out transitive rates" in {
+    assert(exchange.getConversion("USD", "AUD") === Some(BigDecimal(0.9911) * (BigDecimal(1.0) / BigDecimal(1.0079))))
+  }
+
+  it should "add missing edges" in {
+    val edges = List(
+      Rate("AUD", "CAD", BigDecimal(1.0079)),
+      Rate("CAD", "USD", BigDecimal(1.0090)),
+      Rate("USD", "CAD", BigDecimal(0.9911)),
+      Rate("CAD", "RUB", BigDecimal(0.9100)),
+      Rate("LYR", "YEN", BigDecimal(0.0700))
+    )
+
+    val allRates: List[Rate] = RateExchange.addMissingRates(edges)
+
+    allRates should contain allOf(
+      Rate("AUD", "CAD", BigDecimal(1.0079)),
+      Rate("CAD", "AUD", BigDecimal(1.0) / BigDecimal(1.0079)),
+      Rate("CAD", "USD", BigDecimal(1.0090)),
+      Rate("USD", "CAD", BigDecimal(0.9911)),
+      Rate("CAD", "RUB", BigDecimal(0.9100)),
+      Rate("RUB", "CAD", BigDecimal(1.0) / BigDecimal(0.9100)),
+      Rate("LYR", "YEN", BigDecimal(0.0700)),
+      Rate("YEN", "LYR", BigDecimal(1.0) / BigDecimal(0.0700))
+    )
   }
 }
