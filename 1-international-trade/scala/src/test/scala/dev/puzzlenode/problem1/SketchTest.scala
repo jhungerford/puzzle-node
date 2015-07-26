@@ -17,16 +17,8 @@ class SketchTest extends FlatSpec with Matchers {
 
     val exchange = RateExchange(rates)
 
-    val zero: Option[BigDecimal] = Some(BigDecimal("0.00"))
-    val total: Option[BigDecimal] = transactions
-      .filter(_.sku == "DM1182")
-      .map(_.amount.toCurrency("USD", exchange))
-      .foldLeft(zero) {
-        case (Some(sum), Some(amount)) => Some(sum + amount)
-        case _ => None
-      }
+    val total = SumTransactions(transactions, exchange, "DM1182", "USD")
 
-    total shouldBe defined
-    total.get.doubleValue() should be (134.22 +- 0.001)
+    assert(total === Some(BigDecimal(134.22)))
   }
 }
