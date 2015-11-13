@@ -18,23 +18,23 @@ class ReadInputTest extends FlatSpec with Matchers with TryValues {
 
     val actualCases = ReadInput(source)
 
-    val caseOne = Set(
-      Flight('A', 'B', new LocalTime(9, 0), new LocalTime(10, 0), 100.0),
-      Flight('B', 'Z', new LocalTime(11, 30), new LocalTime(13, 30), 100.0),
-      Flight('A', 'Z', new LocalTime(10, 0), new LocalTime(12, 0), 300.0)
-    )
+    val caseOne = FlightCase(List(
+      Flight("A", "B", new LocalTime(9, 0), new LocalTime(10, 0), 100.0),
+      Flight("B", "Z", new LocalTime(11, 30), new LocalTime(13, 30), 100.0),
+      Flight("A", "Z", new LocalTime(10, 0), new LocalTime(12, 0), 300.0)
+    ))
     
-    val caseTwo = Set(
-      Flight('A', 'B', new LocalTime(8, 0), new LocalTime(9, 0), 50.0),
-      Flight('A', 'B', new LocalTime(12, 0), new LocalTime(13, 0), 300.0),
-      Flight('A', 'C', new LocalTime(14, 0), new LocalTime(15, 30), 175.0),
-      Flight('B', 'C', new LocalTime(10, 0), new LocalTime(11, 0), 75.0),
-      Flight('B', 'Z', new LocalTime(15, 0), new LocalTime(16, 30), 250.0),
-      Flight('C', 'B', new LocalTime(15, 45), new LocalTime(16, 45), 50.0),
-      Flight('C', 'Z', new LocalTime(16, 0), new LocalTime(19, 0), 100.0)
-    )
+    val caseTwo = FlightCase(List(
+      Flight("A", "B", new LocalTime(8, 0), new LocalTime(9, 0), 50.0),
+      Flight("A", "B", new LocalTime(12, 0), new LocalTime(13, 0), 300.0),
+      Flight("A", "C", new LocalTime(14, 0), new LocalTime(15, 30), 175.0),
+      Flight("B", "C", new LocalTime(10, 0), new LocalTime(11, 0), 75.0),
+      Flight("B", "Z", new LocalTime(15, 0), new LocalTime(16, 30), 250.0),
+      Flight("C", "B", new LocalTime(15, 45), new LocalTime(16, 45), 50.0),
+      Flight("C", "Z", new LocalTime(16, 0), new LocalTime(19, 0), 100.0)
+    ))
 
-    val expectedCases = Set(caseOne, caseTwo)
+    val expectedCases = List(caseOne, caseTwo)
 
     actualCases.success.value should contain theSameElementsAs expectedCases
   }
@@ -45,7 +45,7 @@ class ReadInputTest extends FlatSpec with Matchers with TryValues {
     val initialState = new AllCasesCountReadState()
     val newState = initialState.handleLine("2")
 
-    val expectedState = new NewlineState(new FlightCountState(2, Set.empty))
+    val expectedState = new NewlineState(new FlightCountState(2, List.empty))
 
     newState shouldEqual expectedState
   }
@@ -64,26 +64,26 @@ class ReadInputTest extends FlatSpec with Matchers with TryValues {
     newState.getClass shouldEqual classOf[ErrorState]
   }
 
-  behavior of "CaseCountState"
+  behavior of "FlightCountState"
 
   it should "parse a number" in {
-    val initialState = FlightCountState(2, Set.empty)
+    val initialState = FlightCountState(2, List.empty)
     val newState = initialState.handleLine("3")
 
-    val expectedState = FlightState(2, 3, Set.empty, Set.empty)
+    val expectedState = FlightState(2, 3, List.empty, List.empty)
 
     newState shouldEqual expectedState
   }
 
   it should "fail on a blank line" in {
-    val initialState = FlightCountState(2, Set.empty)
+    val initialState = FlightCountState(2, List.empty)
     val newState = initialState.handleLine("two")
 
     newState.getClass shouldEqual classOf[ErrorState]
   }
 
   it should "fail on a non-numeric line" in {
-    val initialState = FlightCountState(2, Set.empty)
+    val initialState = FlightCountState(2, List.empty)
     val newState = initialState.handleLine("two")
 
     newState.getClass shouldEqual classOf[ErrorState]
@@ -93,7 +93,7 @@ class ReadInputTest extends FlatSpec with Matchers with TryValues {
   behavior of "FlightState"
 
   it should "Parse a flight" in {
-    val initialState = FlightState(2, 2, Set.empty, Set.empty)
+    val initialState = FlightState(2, 2, List.empty, List.empty)
     val newState = initialState.handleLine("A B 09:00 10:00 100.00")
 
     newState.getClass shouldEqual classOf[FlightState]
@@ -102,29 +102,29 @@ class ReadInputTest extends FlatSpec with Matchers with TryValues {
     newFlightState.allCasesLeft shouldEqual initialState.allCasesLeft
     newFlightState.allCases shouldEqual initialState.allCases
     newFlightState.flightsLeft shouldEqual initialState.flightsLeft - 1
-    newFlightState.flights shouldEqual Set(Flight('A', 'B', new LocalTime(9, 0), new LocalTime(10, 0), 100.0))
+    newFlightState.flights shouldEqual List(Flight("A", "B", new LocalTime(9, 0), new LocalTime(10, 0), 100.0))
   }
 
   it should "Transition when all flights are parsed" in {
-    val initialState = FlightState(2, 1, Set.empty, Set.empty)
+    val initialState = FlightState(2, 1, List.empty, List.empty)
     val newState = initialState.handleLine("A Z 10:00 12:00 300.00")
 
-    val expectedFlight = Flight('A', 'Z', new LocalTime(10, 0), new LocalTime(12, 0), 300.0)
-    val expectedState: NewlineState = NewlineState(FlightCountState(1, Set(new FlightCase(Set(expectedFlight)))))
+    val expectedFlight = Flight("A", "Z", new LocalTime(10, 0), new LocalTime(12, 0), 300.0)
+    val expectedState: NewlineState = NewlineState(FlightCountState(1, List(new FlightCase(List(expectedFlight)))))
 
-    newState.getClass shouldEqual expectedState
+    newState shouldEqual expectedState
   }
 
   it should "Transition when all flights are parsed and all cases are complete" in {
-    val initialState = FlightState(1, 1, Set.empty, Set.empty)
+    val initialState = FlightState(1, 1, List.empty, List.empty)
     val newState = initialState.handleLine("C Z 16:00 19:00 100.00")
 
-    val expectedFlight = Flight('C', 'Z', new LocalTime(16, 0), new LocalTime(19, 0), 100.0)
-    val expectedState: DoneState = DoneState(Set(new FlightCase(Set(expectedFlight))))
+    val expectedFlight = Flight("C", "Z", new LocalTime(16, 0), new LocalTime(19, 0), 100.0)
+    val expectedState: DoneState = DoneState(List(new FlightCase(List(expectedFlight))))
   }
 
   it should "fail on a non-flight line" in {
-    val initialState = FlightState(2, 2, Set.empty, Set.empty)
+    val initialState = FlightState(2, 2, List.empty, List.empty)
     val newState = initialState.handleLine("not a flight")
 
     newState.getClass shouldEqual classOf[ErrorState]
@@ -144,7 +144,7 @@ class ReadInputTest extends FlatSpec with Matchers with TryValues {
   behavior of "DoneState"
 
   it should "always stay the same" in {
-    val initialState = DoneState(Set.empty)
+    val initialState = DoneState(List.empty)
     val newState = initialState.handleLine("")
 
     newState shouldEqual initialState

@@ -3,7 +3,7 @@ package dev.puzzlenode
 import org.joda.time.LocalTime
 
 package object problem2 {
-  case class Flight(startCity: Char, endCity: Char, startTime: LocalTime, endTime: LocalTime, cost: BigDecimal)
+  case class Flight(startCity: String, endCity: String, startTime: LocalTime, endTime: LocalTime, cost: Double)
 
-  case class FlightCase(flights: Set[Flight])
+  case class FlightCase(flights: List[Flight])
 }
