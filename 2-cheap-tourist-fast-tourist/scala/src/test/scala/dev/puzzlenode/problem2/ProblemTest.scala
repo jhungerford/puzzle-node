@@ -17,13 +17,16 @@ class ProblemTest extends FlatSpec with Matchers {
     val inputSource = Source.fromFile(inputFile)
 
     val outputFile = new File(Resources.getResource("sample-output.txt").toURI)
-    val outputLines = Source.fromFile(outputFile).getLines().toList
+    val outputLines = Source.fromFile(outputFile).getLines().filterNot(_.isEmpty).toList
 
     val flightCases = ReadInput(inputSource).get
 
     val solutionLines = flightCases
       .map(SolveCase(_))
-      .flatMap(caseSolution => List(caseSolution.steve.format, caseSolution.jennifer.format))
+      .flatMap(caseSolution => List(
+        caseSolution.lowestCost.format,
+        caseSolution.shortestTime.format
+      ))
 
     solutionLines should contain theSameElementsInOrderAs outputLines
   }

@@ -1,7 +1,6 @@
 package dev.puzzlenode
 
-import org.joda.time.LocalTime
-import org.joda.time.format.{DateTimeFormatter, DateTimeFormat}
+import org.joda.time.{LocalTime, Minutes}
 
 package object problem2 {
   case class Flight(startCity: String, endCity: String, startTime: LocalTime, endTime: LocalTime, cost: Double)
@@ -9,13 +8,15 @@ package object problem2 {
   case class FlightCase(flights: List[Flight])
 
   case class Path(flights: List[Flight]) {
-    lazy val startCity = flights.head.startCity
-    lazy val endCity = flights.last.endCity
+    lazy val startCity: String = flights.head.startCity
+    lazy val endCity: String = flights.last.endCity
 
-    lazy val startTime = flights.head.startTime
-    lazy val endTime = flights.last.endTime
+    lazy val startTime: LocalTime = flights.head.startTime
+    lazy val endTime: LocalTime = flights.last.endTime
 
-    lazy val cost = flights.foldLeft(0.0) { (cost, flight) => cost + flight.cost }
+    lazy val cost: Double = flights.foldLeft(0.0) { (cost, flight) => cost + flight.cost }
+
+    lazy val minutes: Int = Minutes.minutesBetween(startTime, endTime).getMinutes
 
     def ++(after: Path): Path = Path(flights ++ after.flights)
   }
@@ -30,5 +31,5 @@ package object problem2 {
     }
   }
 
-  case class CaseSolution(steve: Solution, jennifer: Solution)
+  case class CaseSolution(lowestCost: Solution, shortestTime: Solution)
 }

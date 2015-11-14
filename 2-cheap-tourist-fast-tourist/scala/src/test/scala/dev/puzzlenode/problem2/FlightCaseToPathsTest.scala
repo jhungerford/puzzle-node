@@ -50,6 +50,11 @@ class FlightCaseToPathsTest extends FlatSpec with Matchers {
       Path(List(
         Flight("A", "C", new LocalTime(14, 0), new LocalTime(15, 30), 175.0),
         Flight("C", "Z", new LocalTime(16, 0), new LocalTime(19, 0), 100.0)
+      )),
+      Path(List(
+        Flight("A", "B", new LocalTime(8, 0), new LocalTime(9, 0), 50.0),
+        Flight("B", "C", new LocalTime(10, 0), new LocalTime(11, 0), 75.0),
+        Flight("C", "Z", new LocalTime(16, 0), new LocalTime(19, 0), 100.0)
       ))
     )
 

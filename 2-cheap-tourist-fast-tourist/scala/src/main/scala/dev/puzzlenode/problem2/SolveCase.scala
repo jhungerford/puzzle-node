@@ -16,8 +16,8 @@ object SolveCase {
   def apply(flightCase: FlightCase): CaseSolution = {
     val paths = FlightCaseToPaths(flightCase)
 
-    val lowestCostPath = paths.sortWith(costSort).head
-    val shortestTimePath = paths.sortWith(timeSort).head
+    val lowestCostPath = paths.sorted(costOrdering).head
+    val shortestTimePath = paths.sorted(timeOrdering).head
 
     CaseSolution(
       PathToSolution(lowestCostPath),
@@ -25,7 +25,21 @@ object SolveCase {
     )
   }
 
-  def costSort(path1: Path, path2: Path): Boolean = ???
+  val costOrdering = new Ordering[Path] {
+    override def compare(x: Path, y: Path): Int = {
+      x.cost - y.cost match {
+        case 0 => x.minutes - y.minutes
+        case diff => diff.signum
+      }
+    }
+  }
 
-  def timeSort(path1: Path, path2: Path): Boolean = ???
+  val timeOrdering = new Ordering[Path] {
+    override def compare(x: Path, y: Path): Int = {
+      x.minutes - y.minutes match {
+        case 0 => (x.cost - y.cost).signum
+        case diff => diff
+      }
+    }
+  }
 }
