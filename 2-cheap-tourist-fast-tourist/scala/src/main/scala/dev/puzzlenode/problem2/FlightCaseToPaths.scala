@@ -2,7 +2,7 @@ package dev.puzzlenode.problem2
 
 // Transforms a flight case into a set of all possible paths from A to Z
 object FlightCaseToPaths {
-  def apply(flightCase: FlightCase): List[Path] = {
+  def apply(flightCase: FlightCase): Set[Path] = {
     // Start with the set of flights -> List(flight)
     val initialPaths = flightCase.flights.map{ flight => Path(List(flight)) }
 
@@ -15,7 +15,7 @@ object FlightCaseToPaths {
     allPaths.filter( path => pathFromAToZ(path) )
   }
 
-  private def iteratePaths(initialPaths: List[Path]): List[Path] = {
+  private def iteratePaths(initialPaths: Set[Path]): Set[Path] = {
     // Paths from A -> Z automatically make it in to the set
     val (aToZPaths, incompletePaths) = initialPaths.partition( path => pathFromAToZ(path) )
 
@@ -27,8 +27,8 @@ object FlightCaseToPaths {
     }
   }
 
-  private def combineIncompletePaths(paths: List[Path]): List[Path] = {
-    val emptyPaths = List.empty[Path]
+  private def combineIncompletePaths(paths: Set[Path]): Set[Path] = {
+    val emptyPaths = Set.empty[Path]
 
     if (paths.size <= 1) {
       emptyPaths
@@ -37,10 +37,10 @@ object FlightCaseToPaths {
       val path = paths.head
       val toMatch = paths.tail
 
-      val matchedPaths: List[Path] = toMatch.foldLeft(emptyPaths) { (acc, matchPath) =>
+      val matchedPaths: Set[Path] = toMatch.foldLeft(paths) { (acc, matchPath) =>
         path match {
-          case before if fitsBefore(before, matchPath) => acc :+ before ++ matchPath
-          case after  if fitsAfter(after, matchPath) => acc :+ matchPath ++ after
+          case before if fitsBefore(before, matchPath) => acc + (before ++ matchPath)
+          case after  if fitsAfter(after, matchPath) => acc + (matchPath ++ after)
           case _ => acc
         }
       }

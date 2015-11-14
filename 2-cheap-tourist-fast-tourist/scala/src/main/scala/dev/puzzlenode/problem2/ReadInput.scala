@@ -46,7 +46,7 @@ case class FlightCountState(allCasesLeft: Int, allCases: List[FlightCase]) exten
   override def handleLine(line: String): ReadState = {
     try {
       val count = line.toInt
-      FlightState(allCasesLeft, count, List.empty, allCases)
+      FlightState(allCasesLeft, count, Set.empty, allCases)
 
     } catch {
       case e: NumberFormatException => ErrorState(s"Flight count ($line) is not a number")
@@ -54,7 +54,7 @@ case class FlightCountState(allCasesLeft: Int, allCases: List[FlightCase]) exten
   }
 }
 
-case class FlightState(allCasesLeft: Int, flightsLeft: Int, flights: List[Flight], allCases: List[FlightCase]) extends ReadState {
+case class FlightState(allCasesLeft: Int, flightsLeft: Int, flights: Set[Flight], allCases: List[FlightCase]) extends ReadState {
   val flight = """([A-Z]) ([A-Z]) (\d{2}):(\d{2}) (\d{2}):(\d{2}) (\d+[.]\d+)""".r
 
   override def handleLine(line: String): ReadState = {
@@ -64,14 +64,14 @@ case class FlightState(allCasesLeft: Int, flightsLeft: Int, flights: List[Flight
           val flight = Flight(fromCity, toCity, new LocalTime(fromHour.toInt, fromMinute.toInt), new LocalTime(toHour.toInt, toMinute.toInt), amount.toDouble)
 
           if (flightsLeft > 1) {
-            FlightState(allCasesLeft, flightsLeft - 1, flights :+ flight, allCases)
+            FlightState(allCasesLeft, flightsLeft - 1, flights + flight, allCases)
 
           } else if (allCasesLeft > 1) {
-            val thisCase = new FlightCase(flights :+ flight)
+            val thisCase = new FlightCase(flights + flight)
             NewlineState(FlightCountState(allCasesLeft - 1, allCases :+ thisCase))
 
           } else {
-            val thisCase = new FlightCase(flights :+ flight)
+            val thisCase = new FlightCase(flights + flight)
             DoneState(allCases :+ thisCase)
           }
 

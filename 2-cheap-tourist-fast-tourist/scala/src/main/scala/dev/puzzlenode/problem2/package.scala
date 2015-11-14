@@ -5,7 +5,7 @@ import org.joda.time.{LocalTime, Minutes}
 package object problem2 {
   case class Flight(startCity: String, endCity: String, startTime: LocalTime, endTime: LocalTime, cost: Double)
 
-  case class FlightCase(flights: List[Flight])
+  case class FlightCase(flights: Set[Flight])
 
   case class Path(flights: List[Flight]) {
     lazy val startCity: String = flights.head.startCity

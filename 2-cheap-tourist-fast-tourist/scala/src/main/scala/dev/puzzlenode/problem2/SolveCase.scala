@@ -16,8 +16,8 @@ object SolveCase {
   def apply(flightCase: FlightCase): CaseSolution = {
     val paths = FlightCaseToPaths(flightCase)
 
-    val lowestCostPath = paths.sorted(costOrdering).head
-    val shortestTimePath = paths.sorted(timeOrdering).head
+    val lowestCostPath = paths.toList.sorted(costOrdering).head
+    val shortestTimePath = paths.toList.sorted(timeOrdering).head
 
     CaseSolution(
       PathToSolution(lowestCostPath),
