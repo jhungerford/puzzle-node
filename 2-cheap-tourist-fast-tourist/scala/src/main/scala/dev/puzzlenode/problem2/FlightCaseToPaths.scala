@@ -1,12 +1,10 @@
 package dev.puzzlenode.problem2
 
-import java.io.Serializable
-
 // Transforms a flight case into a set of all possible paths from A to Z
 object FlightCaseToPaths {
-  def apply(flightCase: FlightCase): List[List[Flight]] = {
+  def apply(flightCase: FlightCase): List[Path] = {
     // Start with the set of flights -> List(flight)
-    val initialPaths = flightCase.flights.map{ flight => List(flight) }
+    val initialPaths = flightCase.flights.map{ flight => Path(List(flight)) }
 
     // Iterate until the set stops changing.
     // Loops are impossible because all flights happen on the same day.
@@ -17,7 +15,7 @@ object FlightCaseToPaths {
     allPaths.filter( path => pathFromAToZ(path) )
   }
 
-  private def iteratePaths(initialPaths: List[List[Flight]]): List[List[Flight]] = {
+  private def iteratePaths(initialPaths: List[Path]): List[Path] = {
     // Paths from A -> Z automatically make it in to the set
     val (aToZPaths, incompletePaths) = initialPaths.partition( path => pathFromAToZ(path) )
 
@@ -29,8 +27,8 @@ object FlightCaseToPaths {
     }
   }
 
-  private def combineIncompletePaths(paths: List[List[Flight]]): List[List[Flight]] = {
-    val emptyPaths = List.empty[List[Flight]]
+  private def combineIncompletePaths(paths: List[Path]): List[Path] = {
+    val emptyPaths = List.empty[Path]
 
     if (paths.size <= 1) {
       emptyPaths
@@ -39,7 +37,7 @@ object FlightCaseToPaths {
       val path = paths.head
       val toMatch = paths.tail
 
-      val matchedPaths: List[List[Flight]] = toMatch.foldLeft(emptyPaths) { (acc, matchPath) =>
+      val matchedPaths: List[Path] = toMatch.foldLeft(emptyPaths) { (acc, matchPath) =>
         path match {
           case before if fitsBefore(before, matchPath) => acc :+ before ++ matchPath
           case after  if fitsAfter(after, matchPath) => acc :+ matchPath ++ after
@@ -51,15 +49,15 @@ object FlightCaseToPaths {
     }
   }
 
-  private def fitsBefore(before: List[Flight], path: List[Flight]): Boolean = {
-    before.last.endCity == path.head.startCity && before.last.endTime.isBefore(path.head.startTime)
+  private def fitsBefore(before: Path, path: Path): Boolean = {
+    before.endCity == path.startCity && before.endTime.isBefore(path.startTime)
   }
 
-  private def fitsAfter(after: List[Flight], path: List[Flight]): Boolean = {
-    after.head.startCity == path.last.endCity && after.head.startTime.isAfter(path.last.endTime)
+  private def fitsAfter(after: Path, path: Path): Boolean = {
+    path.endCity == after.startCity && path.endTime.isBefore(after.startTime)
   }
 
-  private def pathFromAToZ(path: List[Flight]): Boolean = {
-    path.head.startCity == "A" && path.last.endCity == "Z"
+  private def pathFromAToZ(path: Path): Boolean = {
+    path.startCity == "A" && path.endCity == "Z"
   }
 }
