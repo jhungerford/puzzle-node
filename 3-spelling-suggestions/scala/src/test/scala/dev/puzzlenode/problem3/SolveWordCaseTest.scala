@@ -28,4 +28,9 @@ class SolveWordCaseTest extends FlatSpec with Matchers {
     val length = SolveWordCase.longestSubsequenceLength("remimance", "reminiscence")
     length shouldEqual 7
   }
+
+  it should "compute the length of pseumoencephalopriphyroidal / pneumoencephalographically correctly" in {
+    val length = SolveWordCase.longestSubsequenceLength("pseumoencephalopriphyroidal", "pneumoencephalographically")
+    length shouldEqual 20
+  }
 }

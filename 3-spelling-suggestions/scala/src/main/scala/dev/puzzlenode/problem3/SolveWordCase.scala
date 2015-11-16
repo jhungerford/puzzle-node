@@ -28,18 +28,16 @@ object SolveWordCase {
 
     (1 to wordX.length).foreach { x =>
       (1 to wordY.length).foreach { y =>
-        val value = if (wordX.charAt(x-1) == wordY.charAt(y-1)) {
-          arr(idx(x-1, y-1)) + 1
+        if (wordX.charAt(x-1) == wordY.charAt(y-1)) {
+          arr(idx(x, y)) = arr(idx(x-1, y-1)) + 1
         } else {
-          Math.max(arr(idx(x-1, y)), arr(idx(x, y-1)))
+          arr(idx(x, y)) = Math.max(arr(idx(x-1, y)), arr(idx(x, y-1)))
         }
-
-        arr(idx(x, y)) = value
       }
     }
 
     arr(idx(wordX.length, wordY.length))
   }
 
-  private def index(wordXLength: Int)(wordXIndex: Int, wordYIndex: Int): Int = (wordXLength + 1) * wordXIndex + (1 + wordYIndex)
+  private def index(wordXLength: Int)(wordXIndex: Int, wordYIndex: Int): Int = (wordXLength + 1) * wordYIndex + wordXIndex
 }
