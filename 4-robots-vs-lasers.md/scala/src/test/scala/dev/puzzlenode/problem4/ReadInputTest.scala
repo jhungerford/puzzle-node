@@ -15,9 +15,9 @@ class ReadInputTest extends FlatSpec with Matchers with TryValues {
     val inputSource = Source.fromFile(inputFile)
 
     val expectedInput = List(
-      FactoryFloor(Lasers("#|#|#|##"), Lasers("###||###"), 3),
-      FactoryFloor(Lasers("##|#|#|#"), Lasers("###||###"), 4),
-      FactoryFloor(Lasers("##|#|#|#"), Lasers("###|||##"), 4)
+      FactoryFloor("#|#|#|##", "###||###", 3),
+      FactoryFloor("##|#|#|#", "###||###", 4),
+      FactoryFloor("##|#|#|#", "###|||##", 4)
     )
 
     ReadInput(inputSource).success.value shouldEqual expectedInput
